@@ -1,0 +1,9 @@
+medmnist
+numpy
+torch
+torchvision
+tqdm
+torchinfo
+torchview
+pathlib
+matplotlib
