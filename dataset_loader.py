@@ -1,5 +1,7 @@
+import torch
 import torch.utils.data as data
 import torchvision.transforms as transforms
+import numpy as np
 
 import medmnist
 from medmnist import INFO, Evaluator
@@ -34,7 +36,7 @@ def get_datasets(data_flag:str, convert_to_binary=True) -> (data.Dataset, data.D
 
     data_transform = transforms.Compose([
         transforms.ToTensor(),
-        transforms.Normalize(mean=[.5], std=[.5])
+        transforms.Normalize(mean=[.5, .5, .5], std=[.5, .5, .5])
     ])
 
     train_dataset = DataClass(split='train', transform=data_transform, download=True)
@@ -49,7 +51,7 @@ def get_datasets(data_flag:str, convert_to_binary=True) -> (data.Dataset, data.D
 
     return train_dataset, test_dataset, val_dataset
 
-def get_dataloader(data_flag:str) -> (data.DataLoader, data.DataLoader, data.DataLoader):
+def get_dataloaders(data_flag:str) -> (data.DataLoader, data.DataLoader, data.DataLoader):
     train_dataset, test_dataset, val_dataset = get_datasets(data_flag, convert_to_binary=True)
 
     train_dataloader = data.DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)

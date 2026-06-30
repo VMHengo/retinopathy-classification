@@ -10,17 +10,26 @@ class ResNet18Binary(nn.Module):
 
         self.model = models.resnet18(weights=None)
 
-        # cater Resnet18 to binary classification on 2D 28x28 images:
+        # cater Resnet18 to binary classification on 28x28 images:
 
-        # reduce input channels to 1
         self.model.conv1 = nn.Conv2d(
-            in_channels=1,
+            in_channels=3,
             out_channels=64,
             kernel_size=3,
             stride=1,
             padding=1,
             bias=False
         )
+
+        # reduce input channels to 1
+        # self.model.conv1 = nn.Conv2d(
+        #     in_channels=1,
+        #     out_channels=64,
+        #     kernel_size=3,
+        #     stride=1,
+        #     padding=1,
+        #     bias=False
+        # )
 
         # remove maxpool as images are already small
         self.model.maxpool = nn.Identity()
