@@ -90,16 +90,22 @@ Install the required packages:
 pip install -r requirements.txt
 ```
 
-Train the models:
+You can also use example weights to see the results directly without training:
+
+```bash
+python evaluate.py use_example=True
+```
+
+Otherwise train the models first:
 
 ```bash
 python train.py
 ```
 
-Evaluate the trained model:
+Then evaluate the trained model:
 
 ```bash
 python evaluate.py
 ```
 
-The best model weights are saved in the `weights/` directory.
+The best model weights are saved in the `weights/` directory. The included example weights are named `example_model_Adam.pt` and `example_model_SGD.pt`.

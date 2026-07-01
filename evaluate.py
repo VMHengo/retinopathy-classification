@@ -1,9 +1,22 @@
 import torch
 import torch.nn as nn
+import sys
+from pathlib import Path
 
 from dataset_loader import get_dataloaders
 from model import ResNet18Binary
 from train import get_device, run_epoch
+
+
+def parse_bool_arg(name, default=False):
+    prefix = f"{name}="
+
+    for arg in sys.argv[1:]:
+        if arg.startswith(prefix):
+            value = arg[len(prefix):].lower()
+            return value in ("1", "true", "yes", "y")
+
+    return default
 
 
 def load_model(model_path, device):
@@ -24,6 +37,12 @@ def load_model(model_path, device):
 
 
 def evaluate_saved_model(model_path, test_dataloader, criterion, device, threshold=None):
+    if not Path(model_path).exists():
+        raise FileNotFoundError(
+            f"Could not find '{model_path}'. Run train.py first or use "
+            "`python evaluate.py use_example=True`."
+        )
+
     model, saved_threshold = load_model(model_path, device)
 
     if threshold is None:
@@ -51,17 +70,28 @@ def print_model_weights_summary(model_path):
 
 
 def main():
+    use_example = parse_bool_arg("use_example", default=False)
     device = get_device()
 
     _, test_dataloader, _ = get_dataloaders("retinamnist")
     criterion = nn.BCEWithLogitsLoss()
 
-    model_paths = {
-        "Adam": "weights/best_model_Adam.pt",
-        "SGD": "weights/best_model_SGD.pt",
-    }
+    if use_example:
+        model_paths = {
+            "Adam": "weights/example_model_Adam.pt",
+            "SGD": "weights/example_model_SGD.pt",
+        }
+        print("-------------------------------------------------------------")
+        print(f"Using example weights:")
+    else:
+        model_paths = {
+            "Adam": "weights/best_model_Adam.pt",
+            "SGD": "weights/best_model_SGD.pt",
+        }
+        print("-------------------------------------------------------------")
+        print(f"Using self-trained weights:")
 
-    print("-------------------------------------------------------------")
+
     for optimizer_name, model_path in model_paths.items():
         test_loss, test_acc, threshold = evaluate_saved_model(
             model_path=model_path,
