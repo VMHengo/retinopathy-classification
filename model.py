@@ -10,8 +10,9 @@ class ResNet18Binary(nn.Module):
 
         self.model = models.resnet18(weights=None)
 
-        # cater Resnet18 to binary classification on 28x28 images:
-
+        # Adapt ResNet18 for native 28x28 RetinaMNIST inputs. The original
+        # ImageNet stem uses a 7x7 stride-2 convolution, which downsamples tiny
+        # images too aggressively.
         self.model.conv1 = nn.Conv2d(
             in_channels=3,
             out_channels=64,
@@ -21,17 +22,7 @@ class ResNet18Binary(nn.Module):
             bias=False
         )
 
-        # reduce input channels to 1
-        # self.model.conv1 = nn.Conv2d(
-        #     in_channels=1,
-        #     out_channels=64,
-        #     kernel_size=3,
-        #     stride=1,
-        #     padding=1,
-        #     bias=False
-        # )
-
-        # remove maxpool as images are already small
+        # Remove maxpool as images are already small.
         self.model.maxpool = nn.Identity()
 
         # reduce output channels to 1 (binary classification)

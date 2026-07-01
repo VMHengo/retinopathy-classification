@@ -33,15 +33,24 @@ class BinaryRetinaDataset(data.Dataset):
 def get_datasets(data_flag:str, convert_to_binary=True) -> (data.Dataset, data.Dataset, data.Dataset):
     info = INFO[data_flag]
     DataClass = getattr(medmnist, info['python_class'])
+    retina_mean = [.5, .5, .5]
+    retina_std = [.5, .5, .5]
 
-    data_transform = transforms.Compose([
+    # training augmentations for improving generalization and accuracy
+    train_transform = transforms.Compose([
+        transforms.RandomRotation(degrees=5),
         transforms.ToTensor(),
-        transforms.Normalize(mean=[.5, .5, .5], std=[.5, .5, .5])
+        transforms.Normalize(mean=retina_mean, std=retina_std)
     ])
 
-    train_dataset = DataClass(split='train', transform=data_transform, download=True)
-    test_dataset = DataClass(split='test', transform=data_transform, download=True)
-    val_dataset = DataClass(split='val', transform=data_transform, download=True)
+    eval_transform = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize(mean=retina_mean, std=retina_std)
+    ])
+
+    train_dataset = DataClass(split='train', transform=train_transform, download=True)
+    test_dataset = DataClass(split='test', transform=eval_transform, download=True)
+    val_dataset = DataClass(split='val', transform=eval_transform, download=True)
 
     if convert_to_binary:
         # convert ordinal regression to binary classification

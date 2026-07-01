@@ -1,3 +1,7 @@
+# model weights
+# weights/
+*.pt
+
 # Guides
 *.ipynb
 
